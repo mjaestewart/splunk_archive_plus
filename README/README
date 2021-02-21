@@ -18,7 +18,7 @@ This app runs with the following components:
   - Logs all events for copies, MD5 sums, and deduplicated replicated bucket removals
   - indexes logs in Splunk to index = archive\_copy, index = archive\_remove
 
-## Preequisites
+## Prerequisites
 
 - Set the coldToFrozenDir on the indexes to be rolled to frozen in indexes.conf
 - Set the path to:
