@@ -59,6 +59,8 @@ This app runs with the following components:
      \- In the above reference the global variable would be set to:
               \- FROZEN_DB_NAME='frozen'
 
+## Global Variables
+
 - SET abslute path to /opt/splunk/var/lib/splunk
   - IDX_PATH='/opt/splunk/var/lib/splunk'
 
@@ -91,6 +93,8 @@ This app runs with the following components:
 
 - SET absolute path for duplicates removal list
   - rm_dupes=/opt/splunk/var/log/splunk/ARCHIVE_rm_dupes_list.log
+
+## **IMPORTANT TO NOTE**
 
 - Line 88 in script is where the copy occurs
   ##Change cp command per your copy method. If Azure is being used then use MinIo
