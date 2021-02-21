@@ -24,6 +24,10 @@ FROZEN_CP_LOG='/opt/splunk/var/log/splunk/ARCHIVE_copy.log'  ## set absolute pat
 RB_ARCH_RM_LOG='/opt/splunk/var/log/splunk/ARCHIVE_rb_remove.log'  ## SET absolute path where Archive rb_ Removal log will reside
 date_timestamp="$(date --utc +%FT%TZ)" ## Log UTC entry time
 log_timestamp="$(date +%s)" ## log appended with epoch timestamp for rolling logs past 5 logs
+arch_idx=/opt/splunk/var/log/splunk/ARCHIVE_list.log  ## set absulute path for archive list
+dup_idx=/opt/splunk/var/log/splunk/ARCHIVE_duplicates_list.log  ## set absolute path for duplicates list
+dupes=$(echo $dup_idx | awk '{print $2}' | sed -e 's,/journal.gz,,')  ## finding duplicate buckets variable
+rm_dupes=/opt/splunk/var/log/splunk/ARCHIVE_rm_dupes_list.log  ## set absolute path for duplicates removal list
 
 
 ## Azure Splunk Archive Copy Function
@@ -81,7 +85,7 @@ do
         ## USE MC commands if needed for AZURE instead of cp
         ##              example: /bin/mc cp -f $file azure/$S3_ARCHIVE_BUCKET/$RELATIVE_PATH > /dev/null
         if md5sum --status -c <(echo $md5_HASH $file/journal.gz); then
-                cp -f -u -p $file/*.gz $file/*.md5 $ARCH_CP_PATH/$RELATIVE_PATH > /dev/null
+                cp -f -u -p $file/*.gz $file/*.md5 $ARCH_CP_PATH/$RELATIVE_PATH > /dev/null ## Change command per your copy method.
                 MD5_MES='MD5_Check_PASSED Copying frozen '$file'/journal.gz to '$ARCH_CP_PATH'/'$RELATIVE_PATH'. '
         else 
                 MD5_MES='MD5_Check_FAILED Not copying '$ARCH_CP_PATH'/'$RELATIVE_PATH'. Exiting. '
@@ -108,12 +112,6 @@ done
 
 ## Removing Duplicate Replicated Archive Buckets
 function spl_rm_rb_dupes() {
-
-## setting scope variables
-arch_idx=/opt/splunk/var/log/splunk/ARCHIVE_list.log  ## set absulute path for archive list
-dup_idx=/opt/splunk/var/log/splunk/ARCHIVE_duplicates_list.log  ## set absolute path for duplicates list
-dupes=$(echo $dup_idx | awk '{print $2}' | sed -e 's,/journal.gz,,')  ## finding duplicate buckets variable
-rm_dupes=/opt/splunk/var/log/splunk/ARCHIVE_rm_dupes_list.log  ## set absolute path for duplicates removal list
 
 if [[ -f $RB_ARCH_RM_LOG ]]; then ## Checking log existence
         mv $RB_ARCH_RM_LOG "$RB_ARCH_RM_LOG"."$log_timestamp" ## Rolling log
