@@ -132,7 +132,7 @@ index = archive_remove
 ### indexes.conf
 
 - If there is an indexes all app then paste these stanzas into that app's indexes.conf
-- Tthen remove this indexes.conf from the app
+- Then remove this indexes.conf from the app
 
 ```bash
 ##Frozen Indexes
