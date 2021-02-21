@@ -1,9 +1,9 @@
 ## README
 
-#########################
-Dev'd by: Mark Stewart
+################################
+Dev'd by: Mark Stewart, M.Sc. 
 Organization: Splunk
-#########################
+################################
 
 
 
@@ -31,45 +31,86 @@ spl_frozen_archive.sh =
 - Set the path to:
 		coldToFrozenDir = $SPLUNK_DB/INDEX_NAME/frozen
 - Ensure the script has the proper permissions to copy and delete buckets on the search peers (indexers)
-- Typically, the Azure Blob Storage is mounted or presented to a proxy server.
+- Typically, the Azure Blob Storage is mounted or presented to a proxy server so minIo should be used
 - Ensure the account running the frozen script has permissions on the proxy server 
   to read and write. 
+- May need to chown -R splunk:splunk /opt/splunk
 
+######################################################################
+## Here is the logic in the copy function:
+######################################################################
 
-##################
-## Here is the logic in the Azure copy function:
-##################
+- The  script is designed to copy originating db_ and rb_ Splunk Archive buckets to an Azure Blob Storage
+  or NAS, SAN, AWS, from the indexes coldToFrozenDir path
+- All buckets are copied and deduplication takes place against those copied buckets preserving
+  the originating db_ buckets first. 
+- After the successful copy of the originating local frozen buckets a conditional check will ensure the 
+  copy was successful then delete the local frozen buckets from the frozen directory.
+- If the copy fails then no buckets will be deleted locally.
+- MD5 sums are created on every file and used for integrity checks for copies
+- All activity gets logged to /opt/splunk/var/log/splunk/ARCHIVE_copy.log
 
-- The  script is designed to copy originating db_ Splunk Archive buckets to an Azure Blob Storage
-  from the indexes coldToFrozenDir path
-- To prevent duplicated rb_ replicated archive buckets from copying to the Azure
-  Blob Storage only the db_ originating buckets are copied.
-- After the successful copy of the originating archive files a conditional check will ensure the 
-  copy was successful then delete the originating db_ bucket from the frozen directory.
-- If the copy fails then no buckets will be deleted. 
-- All activity gets logged to /opt/splunk/var/log/splunk/frozen_copy.log
-
-##################
+######################################################################
 ## Here is the logic in the Replicated Archive Buckets function:
-##################
+#######################################################################
 
-- The script recursively finds all replicated archive files in the coldToFrozenDir path
+- The script recursively finds all replicated frozen buckets in the coldToFrozenDir path
   that are replicated copies (rb_)
-- A conditional check validates the successful existence of rb_ replicated archive buckets
-- if rb_ jurnal.gz exist then remove the replicated archive buckets
-- All activity gets logged to /opt/splunk/var/log/splunk/rb_archive_rm.log
+- A conditional check validates the successful existence of rb_ replicated frozen buckets
+- if rb_ journal.gz files exist alongside an originating db_ bucket then remove the replicated rb_ frozen buckets
+- All activity gets logged to /opt/splunk/var/log/splunk/ARCHIVE_rb_remove.log
 
 ##########################
 ## spl_frozen_archive.sh
 ##########################
 
-- ** Be sure to set the FROZEN_DB_NAME global variable in the script
+- ** Be sure to set the global variable in the script
 - ** If "frozen" is not the path in the coldToFrozenDir path then set
      the correct value on the global variable
 
      ** coldToFrozenDir = $SPLUNK_DB/_internal/frozen
      - In the above reference the global variable would be set to:
               - FROZEN_DB_NAME='frozen' 
+
+## SET abslute path to /opt/splunk/var/lib/splunk
+- IDX_PATH='/opt/splunk/var/lib/splunk'
+
+## SET absolute path to where archive copies will be transferred to
+- ARCH_CP_PATH='/opt/frozen'
+
+## SET the name of directory where original frozen data lives
+- FROZEN_DB_NAME='frozen'
+
+## set absolute path where Archive Copy log will reside
+- FROZEN_CP_LOG='/opt/splunk/var/log/splunk/ARCHIVE_copy.log'
+
+## SET absolute path where Archive rb_ Removal log will reside
+- RB_ARCH_RM_LOG='/opt/splunk/var/log/splunk/ARCHIVE_rb_remove.log'
+
+## Event UTC entry time
+- date_timestamp="$(date --utc +%FT%TZ)"
+
+## log appended with epoch timestamp for rolling logs and keeping only 4 rolling logs
+- log_timestamp="$(date +%s)"
+
+## set absulute path for archive list
+- arch_idx=/opt/splunk/var/log/splunk/ARCHIVE_list.log
+
+## set absolute path for duplicates list
+- dup_idx=/opt/splunk/var/log/splunk/ARCHIVE_duplicates_list.log
+
+## finding duplicate buckets variable
+- dupes=$(echo $dup_idx | awk '{print $2}' | sed -e 's,/journal.gz,,')
+
+## set absolute path for duplicates removal list
+- rm_dupes=/opt/splunk/var/log/splunk/ARCHIVE_rm_dupes_list.log
+
+- Line 88 in script is where the copy occurs
+    ## Change cp command per your copy method. If Azure is being used then use MinIo
+    -  cp -f -u -p $file/*.gz $file/*.md5 $ARCH_CP_PATH/$RELATIVE_PATH > /dev/null 
+
+- Line 98 is where source removal of local frozen buckets and is currently commented out. Remove comment to activate removal. 
+    - #rm -rf $src_arch_folder  ## REMOVING ORIGINAL ARCHIVES
 
 ##################
 ## inputs.conf
@@ -81,8 +122,9 @@ spl_frozen_archive.sh =
 - Logic in the script only keeps a total of 5 log files. 
 - Every execution run of the script a log rotates and prunes the oldest. 
 
-##################
-##################
+######################################################################
+
+######################################################################
 
 ## Scripted Input for Azure Frozen Copy Job
 
@@ -103,9 +145,9 @@ index = archive_copy
 disabled = 0
 sourcetype = archive_remove
 index = archive_remove
+######################################################################
 
-##################
-##################
+######################################################################
 
 
 ##################
@@ -115,22 +157,28 @@ index = archive_remove
 - If there is an indexes all app then paste these stanzas into that app's indexes.conf
 - Tthen remove this indexes.conf from the app
 
-##################
-##################
+######################################################################
 
-[azure_frozen]
-homePath = volume:primary/azure_frozen/db
-coldPath = volume:primary/azure_frozen/colddb
-thawedPath = $SPLUNK_DB/azure_frozen/thaweddb
-coldToFrozenDir = $SPLUNK_DB/azure_frozen/frozen
+######################################################################
+
+## Frozen Indexes
+## If have an indexes all app then paste into that conf
+## then remove this indexes.conf from the app
+
+[archive_copy]
+homePath = volume:primary/$_index_name/db
+coldPath = volume:primary/$_index_name/colddb
+thawedPath = $SPLUNK_DB/$_index_name/thaweddb
+coldToFrozenDir = $SPLUNK_DB/$_index_name/frozen
 frozenTimePeriodInSecs = 220752000
 
-[archive_rm]
-homePath = volume:primary/archive_rm/db
-coldPath = volume:primary/archive_rm/colddb
-thawedPath = $SPLUNK_DB/archive_rm/thaweddb
-coldToFrozenDir = $SPLUNK_DB/archive_rm/frozen
-frozenTimePeriodInSecs = 220752000
+[archive_remove]
+homePath = volume:primary/$_index_name/db
+coldPath = volume:primary/$_index_name/colddb
+thawedPath = $SPLUNK_DB/$_index_name/thaweddb
+coldToFrozenDir = $SPLUNK_DB/$_index_name/frozen
+frozenTimePeriodInSecs = 22075200
 
-##################
-##################
+######################################################################
+
+######################################################################
