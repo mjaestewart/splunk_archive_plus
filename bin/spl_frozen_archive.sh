@@ -1,22 +1,8 @@
 #!/bin/bash
 
-# This script is designed to copy Splunk Archive buckets to an Azure Blob Storage.
-
-# After the successful copy of the archive files a conditional check will ensure the 
-# copy was successful then delete the originating archive buckets from the frozen source directory.
-
-# If the copy fails then no buckets will be deleted. 
-# Check the log file /opt/splunk/var/log/splunk/frozen_copy.log
-
-# Ensure the script has the proper permissions to copy and delete buckets.
-
-# Typically, the Azure Blob Storage is mounted or presented to a proxy server.
-
-# Ensure the account running the frozen script has permissions on the proxy server 
-# to read and write. 
+## Please review README.md for more information on this script.
 
 ## Setting Global Variables
-## Set the ARCHIVE_BUCKET value to be the Azure Blob Storage Proxy Host (i.e. azurehostblob)
 IDX_PATH='/opt/splunk/var/lib/splunk'  ## SET abslute path to /opt/splunk/var/lib/splunk
 ARCH_CP_PATH='/opt/frozen'  ## SET absolute path to where archive copies will be transferred to
 FROZEN_DB_NAME='frozen'  ## SET the name of directory where original frozen data lives
