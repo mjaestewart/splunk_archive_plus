@@ -7,16 +7,16 @@ This app provides a method of transferring frozen originating archive buckets fr
 
 This app runs with the following components:
 
-inputs.conf = scripted input executes script on intervals AND monitors the scripting outputs
-indexes.conf = sets the indexes for event ingestion from the scripting output
-spl_frozen_archive.sh =
-            - copies the originating (db\_) and (rb\_) buckets from local frozen repositories to Azure blob via MinIo, NAS vi cp, SAN via cp, or AWS via cli command.
-            - MD5 sums are set on ALL frozen buckets/journal.gz files for integritey checks
-            - MD5 sums are used to validate successful copy of archived data from source to destination
-            - Removes ALL originating local frozen buckets on all search peers (db\_ AND rb\_) upon a successful copy
-            - Deduplicates the replicated archive buckets (rb\_) and keeps ALL originating (db\_) buckets to save on storage footprint
-            - Logs all events for copies, MD5 sums, and deduplicated replicated bucket removals
-            - indexes logs in Splunk to index = archive\_copy, index = archive\_remove
+- inputs.conf = scripted input executes script on intervals AND monitors the scripting outputs
+- indexes.conf = sets the indexes for event ingestion from the scripting output
+- spl_frozen_archive.sh
+  - copies the originating (db\_) and (rb\_) buckets from local frozen repositories to Azure blob via MinIo, NAS vi cp, SAN via cp, or AWS via cli command.
+  - MD5 sums are set on ALL frozen buckets/journal.gz files for integritey checks
+  - MD5 sums are used to validate successful copy of archived data from source to destination
+  - Removes ALL originating local frozen buckets on all search peers (db\_ AND rb\_) upon a successful copy
+  - Deduplicates the replicated archive buckets (rb\_) and keeps ALL originating (db\_) buckets to save on storage footprint
+  - Logs all events for copies, MD5 sums, and deduplicated replicated bucket removals
+  - indexes logs in Splunk to index = archive\_copy, index = archive\_remove
 
 ## Preequisites
 
