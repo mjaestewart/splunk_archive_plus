@@ -18,8 +18,8 @@ spl_frozen_archive.sh =
             - copies the originating (db_) and (rb_) buckets from local frozen repositories to Azure blob via MinIo, NAS vi cp, SAN via cp, or AWS via cli command.
             - MD5 sums are set on ALL frozen buckets/journal.gz files for integritey checks
             - MD5 sums are used to validate successful copy of archived data from source to destination
-						- Removes ALL originating local frozen buckets on all search peers (db_ AND rb_) upon a successful copy
-						- Deduplicates the replicated archive buckets (rb_) and keeps ALL originating (db_) buckets to save on storage footprint
+            - Removes ALL originating local frozen buckets on all search peers (db_ AND rb_) upon a successful copy
+            - Deduplicates the replicated archive buckets (rb_) and keeps ALL originating (db_) buckets to save on storage footprint
             - Logs all events for copies, MD5 sums, and deduplicated replicated bucket removals
             - indexes logs in Splunk to index = archive_copy, index = archive_remove
 
@@ -30,7 +30,7 @@ spl_frozen_archive.sh =
 
 - Set the coldToFrozenDir on the indexes to be rolled to frozen in indexes.conf
 - Set the path to:
-		coldToFrozenDir = $SPLUNK_DB/INDEX_NAME/frozen
+	coldToFrozenDir = $SPLUNK_DB/INDEX_NAME/frozen
 - Ensure the script has the proper permissions to copy and delete buckets on the search peers (indexers)
 - Typically, the Azure Blob Storage is mounted or presented to a proxy server so minIo should be used
 - Ensure the account running the frozen script has permissions on the proxy server 
