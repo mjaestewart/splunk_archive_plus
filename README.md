@@ -109,13 +109,14 @@ This app runs with the following components:
 
 ### Scripted Inputs for Azure Frozen Copy Job
 
+```bash
 [script://./bin/spl_frozen_archive.sh]
 disabled = 0
 sourcetype = azure_copy
-\#for testing: every 2 mins
+#for testing: every 2 mins
 interval = 120
-\#execute every 24 hours
-\#interval = 86400
+#execute every 24 hours
+#interval = 86400
 
 [monitor:///opt/splunk/var/log/splunk/ARCHIVE_copy.log*]
 disabled = 0
@@ -126,15 +127,17 @@ index = archive_copy
 disabled = 0
 sourcetype = archive_remove
 index = archive_remove
+```
 
 ### indexes.conf
 
 - If there is an indexes all app then paste these stanzas into that app's indexes.conf
 - Tthen remove this indexes.conf from the app
 
-\##Frozen Indexes
-\##If have an indexes all app then paste into that conf
-\##then remove this indexes.conf from the app
+```bash
+##Frozen Indexes
+##If have an indexes all app then paste into that conf
+##then remove this indexes.conf from the app
 
 [archive_copy]
 homePath = volume:primary/$_index_name/db
@@ -149,3 +152,4 @@ coldPath = volume:primary/$_index_name/colddb
 thawedPath = $SPLUNK_DB/$_index_name/thaweddb
 coldToFrozenDir = $SPLUNK_DB/$_index_name/frozen
 frozenTimePeriodInSecs = 22075200
+```

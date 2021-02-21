@@ -109,6 +109,7 @@ This app runs with the following components:
 
 ### Scripted Inputs for Azure Frozen Copy Job
 
+```
 [script://./bin/spl_frozen_archive.sh]
 disabled = 0
 sourcetype = azure_copy
@@ -126,12 +127,14 @@ index = archive_copy
 disabled = 0
 sourcetype = archive_remove
 index = archive_remove
+```
 
 ### indexes.conf
 
 - If there is an indexes all app then paste these stanzas into that app's indexes.conf
 - Tthen remove this indexes.conf from the app
 
+```
 \##Frozen Indexes
 \##If have an indexes all app then paste into that conf
 \##then remove this indexes.conf from the app
@@ -149,3 +152,4 @@ coldPath = volume:primary/$_index_name/colddb
 thawedPath = $SPLUNK_DB/$_index_name/thaweddb
 coldToFrozenDir = $SPLUNK_DB/$_index_name/frozen
 frozenTimePeriodInSecs = 22075200
+```
