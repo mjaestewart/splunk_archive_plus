@@ -13,11 +13,14 @@ This app run with the following components:
 
 inputs.conf = scripted input executes script on intervals AND monitors the scripting outputs
 indexes.conf = sets the indexes for event ingestion from the scripting output
-azure_frozen_copy.sh = copies the originating (rb_) data from frozen storage to Azure blob
-						Removes the originating archive files upon a successful copy
-						Logs all events
-						Removes the replicated archive copies
-						Logs all events
+spl_frozen_archive.sh = 
+            - copies the originating (db_) and (rb_) buckets from local frozen repositories to Azure blob via MinIo, NAS vi cp, SAN via cp, or AWS via cli command.
+            - MD5 sums are set on ALL frozen buckets/journal.gz files for integritey checks
+            - MD5 sums are used to validate successful copy of archived data from source to destination
+						- Removes ALL originating local frozen buckets on all search peers (db_ AND rb_) upon a successful copy
+						- Deduplicates the replicated archive buckets (rb_) and keeps ALL originating (db_) buckets to save on storage footprint
+            - Logs all events for copies, MD5 sums, and deduplicated replicated bucket removals
+            - indexes logs in Splunk to index = archive_copy, index = archive_remove
 
 
 ##################
@@ -60,49 +63,46 @@ azure_frozen_copy.sh = copies the originating (rb_) data from frozen storage to 
 ## spl_frozen_archive.sh
 ##########################
 
-- ** Be sure to set the ARCHIVE_BUCKET global variable in the script
+- ** Be sure to set the FROZEN_DB_NAME global variable in the script
 - ** If "frozen" is not the path in the coldToFrozenDir path then set
      the correct value on the global variable
 
-     ** coldToFrozenDir = $SPLUNK_DB/azure_frozen/frozen
-     FROZEN_DB_NAME='frozen'
-
-     TO
-
-     ** coldToFrozenDir = $SPLUNK_DB/azure_frozen/frozendb
-     FROZEN_DB_NAME='FROZEN_DIR_NAME'
-
-- Logging locations should be fine but if changed then change the monitoring 
-  stanza in inputs.conf
-
+     ** coldToFrozenDir = $SPLUNK_DB/_internal/frozen
+     - In the above reference the global variable would be set to:
+              - FROZEN_DB_NAME='frozen' 
 
 ##################
 ## inputs.conf
 ##################
 
-- The scripted inputs executes the script to enforce the time based interval of excution.
-- Change the values as necessary.
-- All script logging is output and monitored.
+- The scripted inputs executes the script to enforce the time based interval of excution on the spl_frozen_archive.sh script.
+- Change the inputs values as necessary.
+- All script logging is output and monitored in /opt/splunk/var/log/splunk/
+- Logic in the script only keeps a total of 5 log files. 
+- Every execution run of the script a log rotates and prunes the oldest. 
 
 ##################
 ##################
 
-#### Scripted Input for Azure Frozen Copy Job
+## Scripted Input for Azure Frozen Copy Job
 
-[script://./bin/azure_frozen_copy.sh]
+[script://./bin/spl_frozen_archive.sh]
 disabled = 0
-sourcetype = azure_frozen
+sourcetype = azure_copy
+# for testing: every 2 mins
 interval = 120
+# execute every 24 hours
+#interval = 86400
 
-[monitor:///opt/splunk/var/log/splunk/azure_frozen_copy.log]
+[monitor:///opt/splunk/var/log/splunk/ARCHIVE_copy.log*]
 disabled = 0
-sourcetype = azure_frozen
-index = azure_frozen
+sourcetype = archive_copy
+index = archive_copy
 
-[monitor:///opt/splunk/var/log/splunk/rb_archive_rm.log]
+[monitor:///opt/splunk/var/log/splunk/ARCHIVE_rb_remove.log*]
 disabled = 0
-sourcetype = archive_rm
-index = archive_rm
+sourcetype = archive_remove
+index = archive_remove
 
 ##################
 ##################
