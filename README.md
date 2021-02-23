@@ -140,16 +140,16 @@ index = archive_remove
 ##then remove this indexes.conf from the app
 
 [archive_copy]
-homePath = volume:primary/$_index_name/db
-coldPath = volume:primary/$_index_name/colddb
-thawedPath = $SPLUNK_DB/$_index_name/thaweddb
-coldToFrozenDir = $SPLUNK_DB/$_index_name/frozen
+homePath = volume:primary/archive_copy/db
+coldPath = volume:primary/archive_copy/colddb
+thawedPath = $SPLUNK_DB/archive_copy/thaweddb
+coldToFrozenDir = $SPLUNK_DB/archive_copy/frozen
 frozenTimePeriodInSecs = 220752000
 
 [archive_remove]
-homePath = volume:primary/$_index_name/db
-coldPath = volume:primary/$_index_name/colddb
-thawedPath = $SPLUNK_DB/$_index_name/thaweddb
-coldToFrozenDir = $SPLUNK_DB/$_index_name/frozen
+homePath = volume:primary/archive_remove/db
+coldPath = volume:primary/archive_remove/colddb
+thawedPath = $SPLUNK_DB/archive_remove/thaweddb
+coldToFrozenDir = $SPLUNK_DB/archive_remove/frozen
 frozenTimePeriodInSecs = 22075200
 ```
