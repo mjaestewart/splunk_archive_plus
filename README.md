@@ -34,6 +34,7 @@ This app runs with the following components:
 - The script has the `source copy path` set to `/opt/frozen` on the local search peers which needs to be changed in the `ARCH_CP_PATH` variable.
 - Can deploy the `splunk_archive_plus` app via Splunk Cluster Master to all search peers.
 - Ensure to `chown -R /opt/` where a `frozen` dir will be created in `/opt/` for the frozen buckets being copied `(local testing)`.
+  - `Subdirectories` are created and named by `index name` for the `copy destination directory`.
 - Only 4 rolling logs are kept by default.
   - Change the `value` of `4` on `line 30` and `110` if you wish to keep more than `4 rolling logs`.
 - `ARCHIVE_copy.log` & `ARCHIVE_rb_remove.log` exist in the `/opt/splunk/var/log/splunk` dir and will be collected by `Splunk inputs.conf`
