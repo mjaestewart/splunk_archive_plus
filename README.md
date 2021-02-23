@@ -29,6 +29,25 @@ This app runs with the following components:
   to read and write.
 - May need to `chown -R splunk:splunk /opt/splunk`
 
+## Lab Testing OOB
+
+- The script has the `source copy path` set to `/opt/frozen` on the local search peers which needs to be changed in the `ARCH_CP_PATH` variable.
+- Can deploy the `splunk_archive_plus` app via Splunk Cluster Master to all search peers.
+- Ensure to `chown -R /opt/` where a `frozen` dir will be created in `/opt/` for the frozen buckets being copied `(local testing)`.
+- Only 4 rolling logs are kept by default.
+  - Change the `value` of `4` on `line 30` and `110` if you wish to keep more than `4 rolling logs`.
+- `ARCHIVE_copy.log` & `ARCHIVE_rb_remove.log` exist in the `/opt/splunk/var/log/splunk` dir and will be collected by `Splunk inputs.conf`
+- Ensure to change the `inputs.conf` scripted input interval to `2 mins` when testing OR `24 hrs` when not testing (`atribs & values already exist`).
+- `Line 74` in the script is where the `copy` occurs. Change the command based on the copy method.
+  - i.e.) `MinIO` is best used with `Azure blob storage` with a Proxy Server.
+  - Can change `cp` to `scp` if going to a location off the server.
+  - `AWS` cli commands can also be used.
+- `Line 84` in the script is where the **removal** of the `local/source` buckets will take place.
+  - `Uncomment Line 84` to remove the source buckets.
+  - This line is `commented out by default` to prevent any `deletions` of data.
+- `Run` a `search` in your `Splunk UI` for `(index=archive_copy OR index=archive_remove)` for complete logging results.
+- **`Enjoy!`**
+
 ## Logic in the copy function
 
 - The  script is designed to copy originating `db\_` and `rb\_` Splunk Archive buckets to an Azure Blob Storage
@@ -92,11 +111,11 @@ This app runs with the following components:
 
 ## **IMPORTANT TO NOTE**
 
-- **`Line 88`** in script is where the copy occurs
+- **`Line 74`** in script is where the copy occurs
   - ##Change cp command per your copy method. If Azure is being used then use MinIo
     - `cp -f -u -p $file/*.gz $file/*.md5 $ARCH\_CP\_PATH/$RELATIVE\_PATH > /dev/null`
 
-- **`Line 74`** is where source removal of local frozen buckets and is currently commented out. Remove comment to activate removal.
+- **`Line 84`** is where source removal of local frozen buckets and is currently commented out. Remove comment to activate removal.
   - `#rm -rf $src\_arch\_folder  ## REMOVING ORIGINAL ARCHIVES`
 
 ### inputs.conf comments
@@ -110,9 +129,9 @@ This app runs with the following components:
 ### Scripted Inputs for Azure Frozen Copy Job
 
 ```bash
-[script://./bin/spl_frozen_archive.sh]
+[script://./bin/spl_archive_plus.sh]
 disabled = 0
-sourcetype = azure_copy
+sourcetype = archive_plus
 #for testing: every 2 mins
 interval = 120
 #execute every 24 hours
