@@ -96,7 +96,7 @@ This app runs with the following components:
   - ##Change cp command per your copy method. If Azure is being used then use MinIo
     - `cp -f -u -p $file/*.gz $file/*.md5 $ARCH\_CP\_PATH/$RELATIVE\_PATH > /dev/null`
 
-- **`Line 98`** is where source removal of local frozen buckets and is currently commented out. Remove comment to activate removal.
+- **`Line 74`** is where source removal of local frozen buckets and is currently commented out. Remove comment to activate removal.
   - `#rm -rf $src\_arch\_folder  ## REMOVING ORIGINAL ARCHIVES`
 
 ### inputs.conf comments
