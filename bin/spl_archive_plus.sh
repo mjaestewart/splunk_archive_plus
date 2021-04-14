@@ -72,6 +72,7 @@ do
         ##              example: /bin/mc cp -f $file azure/$S3_ARCHIVE_BUCKET/$RELATIVE_PATH > /dev/null
         if md5sum --status -c <(echo $md5_HASH $file/journal.gz); then
                 cp -f -u -p $file/*.gz $file/*.md5 $ARCH_CP_PATH/$RELATIVE_PATH > /dev/null ## Change command per your copy method.
+                #/bin/mc cp -f $file azure/$S3_ARCHIVE_BUCKET/$RELATIVE_PATH > /dev/null
                 MD5_MES='MD5_Check_PASSED Copying frozen '$file'/journal.gz to '$ARCH_CP_PATH'/'$RELATIVE_PATH'. '
         else 
                 MD5_MES='MD5_Check_FAILED Not copying '$ARCH_CP_PATH'/'$RELATIVE_PATH'. Exiting. '
