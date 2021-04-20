@@ -1,5 +1,5 @@
 #!/bin/bash
-#thanks
+
 
 ## Please review README.md for more information on this script.
 
