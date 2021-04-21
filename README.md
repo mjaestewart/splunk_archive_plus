@@ -29,6 +29,12 @@ This app runs with the following components:
   to read and write.
 - May need to `chown -R splunk:splunk /opt/splunk`
 
+---
+
+## Mounting Blob Storage to Indexers
+
+---
+
 ## [](https://docs.microsoft.com/en-us/azure/storage/blobs/storage-how-to-mount-container-linux)Overview
 
 [Blobfuse](https://github.com/Azure/azure-storage-fuse) is a virtual file system driver for Azure Blob storage. Blobfuse allows you to access your existing block blob data in your storage account through the Linux file system. Blobfuse uses the virtual directory scheme with the forward-slash '/' as a delimiter.
@@ -149,6 +155,8 @@ echo "hello world" > test/blob.txt
 
 ---
 You are now ready to use the [](https://github.com/mjaestewart/splunk_archive_plus)**`Splunk Archive Plus App`** with Azure Blob Storage!
+
+---
 
 ## Lab Testing OOB
 
