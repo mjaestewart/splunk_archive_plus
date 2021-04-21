@@ -55,7 +55,7 @@ for file in $(find . -name '*.gz' -printf "%h\n" | grep $FROZEN_DB_NAME);
 do
         ## Setting scope variables
         RELATIVE_PATH=$(echo $file | sed 's/\.\///')
-        BUCKET_DETAILS=$(echo $RELATIVE_PATH | awk -F/ '{print "index="$1 " " "bucket="$3}')
+        BUCKET_DETAILS=$(echo $RELATIVE_PATH | awk -F/ '{print "index_name="$1 " " "bucket_id="$3}')
         md5_FILE_NAME=$(echo $RELATIVE_PATH | awk -F/ '{print $3}')
         md5_HASH=$(cat $file/$md5_FILE_NAME.md5 | head -c32)
 
