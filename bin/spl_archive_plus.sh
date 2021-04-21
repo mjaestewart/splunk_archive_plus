@@ -5,7 +5,7 @@
 
 ## Setting Global Variables
 IDX_PATH='/opt/splunk/var/lib/splunk'  ## SET abslute path to /opt/splunk/var/lib/splunk
-ARCH_CP_PATH='/opt/frozen'  ## SET absolute path to where archive copies will be transferred to
+ARCH_CP_PATH='/hom/splunk/splunkarchive'  ## SET absolute path to where archive copies will be transferred to
 FROZEN_DB_NAME='frozen'  ## SET the name of directory where original frozen data lives
 FROZEN_CP_LOG='/opt/splunk/var/log/splunk/ARCHIVE_copy.log'  ## set absolute path where Archive Copy log will reside
 RB_ARCH_RM_LOG='/opt/splunk/var/log/splunk/ARCHIVE_rb_remove.log'  ## SET absolute path where Archive rb_ Removal log will reside
