@@ -15,7 +15,7 @@ This app runs with the following components:
   - `MD5 sums` are used to validate successful copy of archived data from source to destination
   - Removes ALL originating local frozen buckets and replicated buckets on all search peers `(db_ AND rb_)` upon a successful copy
   - Deduplicates archive buckets `(db)` and `(rb_)` and keeps the originating `(db\_)` buckets if available to save on storage footprint
-  - Logs all events for copies, MD5 sums, and deduplicated bucket removals from archive storage
+  - Logs all events for copies, MD5 sums, and deduplicated bucket removals from archive
   - indexes logs in Splunk to `index = archive_copy`, `index = archive_remove`
 
 ## Prerequisites
@@ -25,8 +25,8 @@ This app runs with the following components:
   - `coldToFrozenDir = $SPLUNK_DB/INDEX_NAME/frozen`
 - Ensure the script has the proper permissions to copy and delete buckets on the search peers (indexers)
 - Typically, the Azure Blob Storage is mounted or presented to the linux indexers
-- Ens
 - May need to `chown -R splunk:splunk /opt/splunk`
+- Ensure to Read the AZURE_BLOBFUSE.md file to mount the storage blob to the linux indexers
 
 ## Lab Testing OOB
 
@@ -64,6 +64,7 @@ This app runs with the following components:
 - The script recursively finds all replicated frozen buckets, both `rb_` and `db_`, in the coldToFrozenDir path
 - A conditional check validates the successful existence of `rb_` replicated frozen buckets
 - if `rb_` journal.gz files exist alongside an originating `db_` bucket then remove the replicated `rb_` frozen buckets
+- if no `db_` bucket exists alongside a replicated `rb_` bucket then one replicated bucket `rb_` will be retained
 - All activity gets logged to `/opt/splunk/var/log/splunk/ARCHIVE_rb_remove.log`
 
 ## Script spl\_frozen\_archive\.sh
@@ -172,3 +173,7 @@ thawedPath = $SPLUNK_DB/archive_remove/thaweddb
 coldToFrozenDir = $SPLUNK_DB/archive_remove/frozen
 frozenTimePeriodInSecs = 22075200
 ```
+
+---
+
+- Splunk Search to get you started:
