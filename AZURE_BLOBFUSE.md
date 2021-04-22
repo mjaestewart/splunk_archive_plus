@@ -111,7 +111,7 @@ For a full list of mount options, check [the blobfuse repository](https://github
 To mount blobfuse, run the following command with your user (splunk account). This command mounts the container specified in '/path/to/fuse\_connection.cfg' onto the location '/mycontainer'.
 
 ```bash
-sudo -u splunk blobfuse /home/splunk/splunkarchive --tmp-path=/mnt/resource/blobfusetmp --config-file=/home/splunk/fuse_connection.cfg -o entry_timeout=240 -o negative_timeout=120 --log-level=LOG_DEBUG --file-cache-timeout-in-seconds=300
+sudo -u splunk blobfuse /home/splunk/splunkarchive --tmp-path=/mnt/resource/blobfusetmp -o attr_timeout=240 -o entry_timeout=240 -o negative_timeout=120 --config-file=/home/splunk/fuse_connection.cfg --log-level=LOG_DEBUG --file-cache-timeout-in-seconds=120
 ```
 
 You should now have access to your block blobs through the regular file system APIs. The user who mounts the directory is the only person who can access it, by default, which secures the access. To allow access to all users, you can mount via the option `-o allow_other`.
@@ -124,3 +124,37 @@ echo "hello world" > test/blob.txt
 
 ---
 You are now ready to use the [](https://github.com/mjaestewart/splunk_archive_plus)**`Splunk Archive Plus App`** with Azure Blob Storage!
+
+---
+
+### Persisting
+
+1. Make sure the fuse package is installed (e.g. yum install fuse)
+2. Update connection.cfg file with your storage account information.
+3. Edit /etc/fstab with the blobfuse script.
+
+Add the following line to use mount.sh:
+
+```bash
+/<path_to_blobfuse>/mount.sh /home/splunk/splunkarchive fuse _netdev
+```
+
+OR
+
+Add the following line to run without mount.sh
+
+```bash
+blobfuse /home/azureuser/mntblobfuse fuse delay\_connect,defaults,\_netdev,--tmp-path=/home/azureuser/tmppath,--config-file=/home/azureuser/connection.cfg,--log-level=LOG\_DEBUG,allow\_other 0 0
+```
+
+(Note: you can omit the delay\_connect option after fuse if you do not want to wait for any dependent services, I left it there to prevent race conditions where sometimes fuse services take a while to load and fstab executes before that)
+
+---
+
+## [](https://github.com/Azure/azure-storage-fuse/wiki/2.-Configuring-and-Running#unmounting)Unmounting
+
+The standard way to unmount a FUSE adapter is to use 'fusermount': 
+
+```bash
+fusermount -u /home/splunk/splunkarchive
+```
