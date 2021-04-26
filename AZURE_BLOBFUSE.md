@@ -1,6 +1,5 @@
----
 
-## Mounting Blob Storage to Indexers
+# Mounting Blob Storage to Indexers
 
 ---
 
@@ -129,11 +128,13 @@ You are now ready to use the [](https://github.com/mjaestewart/splunk_archive_pl
 
 ### Persisting
 
+**`NOTE:`** __Use persisting connection to ensure that the blob storage gets mounted at boottime.__
+
 1. Make sure the fuse package is installed (e.g. yum install fuse)
 2. Update connection.cfg file with your storage account information.
 3. Edit /etc/fstab with the blobfuse script.
 
-Add the following to use mount.sh:
+Add the following to use `mount.sh`:
 
 ```bash
 ## add mount.sh to /home/splunk
@@ -142,26 +143,14 @@ vi mount.sh
 
 ## add the following to mount.sh
 #!/bin/bash
-BLOBFS_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-cd $BLOBFS_DIR
-./sudo -u splunk blobfuse $1 --tmp-path=/mnt/resource/blobfusetmp -o attr_timeout=240 -o entry_timeout=240 -o negative_timeout=120 --config-file=/home/splunk/fuse_connection.cfg --log-level=LOG_DEBUG --file-cache-timeout-in-seconds=120
+sudo -u splunk blobfuse $1 --tmp-path=/mnt/resource/blobfusetmp -o attr_timeout=240 -o entry_timeout=240 -o negative_timeout=120 --config-file=/home/splunk/fuse_connection.cfg --log-level=LOG_DEBUG --file-cache-timeout-in-seconds=120
 
 ## make mount.sh executable
 chmod +x mount.sh
 
 ## edit /etc/fstab to add following line
-/home/splunk/mount.sh /home/splunk/splunkarchive fuse _netdev
+/home/splunk/mount.sh /home/splunk/splunkarchive fuse _netdev 0 0
 ```
-
-OR
-
-Add the following line to run without mount.sh
-
-```bash
-sudo -u splunk blobfuse /home/splunk/splunkarchive fuse delay_connect,defaults,_netdev,--tmp-path=/mnt/resource/blobfusetmp,--config-file=/home/splunk/fuse_connection.cfg,--log-level=LOG_DEBUG,allow_other 0 0
-```
-
-(Note: you can omit the delay\_connect option after fuse if you do not want to wait for any dependent services, I left it there to prevent race conditions where sometimes fuse services take a while to load and fstab executes before that)
 
 ---
 
