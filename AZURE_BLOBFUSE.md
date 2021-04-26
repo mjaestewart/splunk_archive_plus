@@ -130,9 +130,10 @@ You are now ready to use the [](https://github.com/mjaestewart/splunk_archive_pl
 
 **`NOTE:`** __Use persisting connection to ensure that the blob storage gets mounted at boottime.__
 
-1. Make sure the fuse package is installed (e.g. yum install fuse)
-2. Update connection.cfg file with your storage account information.
-3. Edit /etc/fstab with the blobfuse script.
+1. Make sure the `fuse package` is installed (e.g. yum install fuse)
+2. Update `fuse_connection.cfg` file with your storage account information (should already exist in `/home/splunk/` and nothing to be done ).
+3. Edit `/etc/fstab` with the blobfuse script.
+4. Create `mount.sh` script in `/home/splunk/splunkarchive`
 
 Add the following to use `mount.sh`:
 
@@ -149,6 +150,7 @@ sudo -u splunk blobfuse $1 --tmp-path=/mnt/resource/blobfusetmp -o attr_timeout=
 chmod +x mount.sh
 
 ## edit /etc/fstab to add following line
+sudo vi /etc/fstab
 /home/splunk/mount.sh /home/splunk/splunkarchive fuse _netdev 0 0
 ```
 
@@ -156,7 +158,7 @@ chmod +x mount.sh
 
 ## [](https://github.com/Azure/azure-storage-fuse/wiki/2.-Configuring-and-Running#unmounting)Unmounting
 
-The standard way to unmount a FUSE adapter is to use 'fusermount': 
+The standard way to `unmount` a FUSE adapter is to use 'fusermount': 
 
 ```bash
 fusermount -u /home/splunk/splunkarchive
