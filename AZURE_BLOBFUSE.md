@@ -158,7 +158,7 @@ sudo vi /etc/fstab
 
 ## [](https://github.com/Azure/azure-storage-fuse/wiki/2.-Configuring-and-Running#unmounting)Unmounting
 
-The standard way to `unmount` a FUSE adapter is to use 'fusermount': 
+The standard way to `unmount` a FUSE adapter is to use `fusermount`: 
 
 ```bash
 fusermount -u /home/splunk/splunkarchive
