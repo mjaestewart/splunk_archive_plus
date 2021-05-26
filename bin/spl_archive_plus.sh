@@ -156,7 +156,8 @@ fi
 if [ -f $rm_dupes ]; then
         while read path; do
                 echo ''$date_timestamp' Removing duplicate archive bucket duplicate='$path'/journal.gz' >> $RB_ARCH_RM_LOG ## writing to log
-                rm_data=$(echo $path | sed -n 's:^\(/[^/]\{1,\}/[^/]\{1,\}/[^/]\{1,\}/[^/]\{1,\}/[^/]\{1,\}\).*:\1:p')  ## extracting full path to duplicate bucket/journal.gz for removal
+                #rm_data=$(echo $path | sed -n 's:^\(/[^/]\{1,\}/[^/]\{1,\}/[^/]\{1,\}/[^/]\{1,\}/[^/]\{1,\}\).*:\1:p')  ## extracting full path to duplicate bucket/journal.gz for removal
+                rm_data=$(echo $path |  sed -e 's,/rawdata,,') 
                 rm -rf $rm_data </dev/null;
         done <"$rm_dupes" ## feeding rm_dupes.log entries for removal list back to while loop
         rm "$rm_dupes" ## removing removal duplicate list
