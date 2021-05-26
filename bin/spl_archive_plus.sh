@@ -84,7 +84,7 @@ do
         ## Conditionally checking the generated md5 hash against the copied journal.gz archive
         ## If copy is successful and hash is validated then delete db_ and rb_ archive buckets at source
         if md5sum --status -c <(echo $md5_HASH $ARCH_CP_PATH/$RELATIVE_PATH/journal.gz); then
-                src_arch_folder=$(echo $file | sed -e 's,/rawdata/,,')
+                src_arch_folder=$(echo $file | sed -e 's,/rawdata,,')
                 #rm -rf $src_arch_folder  ## REMOVING ORIGINAL ARCHIVES
                 RES='SUCCESS'
                 MES='COPY_SUCCESSFUL of archive '$file'/journal.gz successfully to '$ARCH_CP_PATH'/'$RELATIVE_PATH'. Deleted '$file'/journal.gz. '
